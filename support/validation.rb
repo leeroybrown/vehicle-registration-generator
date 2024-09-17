@@ -36,7 +36,12 @@ module Validation
   # @return nil [NilClass]
 
   def self.age_identifier(date_to_validate:, vehicle:)
-    extract_date = Date.parse(date_to_validate)
+    begin
+      extract_date = Date.parse(date_to_validate) # handles invalid dates
+    rescue Date::Error => error
+      vehicle.errors[:invalid_date] = error
+    end
+
     if vehicle.errors.empty?
       if extract_date.month.between?(3, 8)
         age = extract_date.strftime('%y')
@@ -65,13 +70,15 @@ module Validation
   end
 
   # Validates the completed registration mark against RegEx
-  # @param reg_mark [String]
+  # @param vehicle [Vehicle]
   # @return nil [NilClass]
 
-  def self.validate_complete_reg_mark(reg_mark:)
+  def self.validate_complete_reg_mark(vehicle:)
     # check registration mark complies with the correct format
-    unless reg_mark.empty?
-      raise "Invalid Reg Mark: #{reg_mark}" unless reg_mark.match(Constants::PatternMatch::COMPLETE_REG_MARK_PATTERN)
+    unless vehicle.reg_mark.empty?
+      unless vehicle.reg_mark.match(Constants::PatternMatch::COMPLETE_REG_MARK_PATTERN)
+        vehicle.errors[:invalid_reg_mark] = vehicle.reg_mark
+      end
     end
   end
 end

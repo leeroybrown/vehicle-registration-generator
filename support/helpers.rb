@@ -7,7 +7,7 @@ def build_reg_mark(row:)
   Validation.area_code(registration_area: row[:registrationarea].to_sym, vehicle: vehicle)
   Validation.age_identifier(date_to_validate: row[:dateofmanufacture], vehicle: vehicle)
   Validation.create_random_letters(vehicle: vehicle)
-  Validation.validate_complete_reg_mark(reg_mark: vehicle.reg_mark)
+  Validation.validate_complete_reg_mark(vehicle: vehicle)
 
   vehicle
 end
@@ -18,7 +18,7 @@ end
 # @return invalid_registration_marks [Array]
 # @return registration_per_area [Hash]
 
-def reg_mark_engine(vehicle_data:)
+def reg_mark_generator(vehicle_data:)
   unique_reg_marks = Set.new
   valid_registration_marks = []
   invalid_registration_marks = []
@@ -31,8 +31,8 @@ def reg_mark_engine(vehicle_data:)
     unless vehicle_record.errors.has_key?(:unknown_area_code)
       duplicate_count = 0
       while unique_reg_marks.include?(vehicle_record.reg_mark) # while generated reg mark is a duplicate
-        if duplicate_count < Constants::RegMarkAttempts::REG_MARK_ATTEMPTS # is my attempts to create a unique reg mark under 10?
-          vehicle_record = build_reg_mark(row: row) # attempt to create a unique one
+        if duplicate_count < Constants::RegMarkAttempts::REG_MARK_ATTEMPTS # is my attempts to create a unique reg mark under specified amount?
+          vehicle_record = build_reg_mark(row: row) # attempt to create a unique reg mark
           duplicate_count += 1 # increment counter by 1
         else # there's still a duplicate reg mark but i've made 10 attempts and failed to create a unique one
           vehicle_record.errors[:duplicate_reg_mark] = vehicle_record.reg_mark # update my vehicle record errors to show a duplicate reg mark
@@ -78,12 +78,11 @@ def summarise_data(valid_vehicles:, invalid_vehicles:, per_area:)
 end
 
 # Handles the running of the program
-# @param none
 # @return nil [NilClass]
 
 def vehicle_registration_generator
   file = FileHandler.read_file(file_name: Constants::FilePath::INPUT_FILE_PATH)
-  valid_registration_marks, invalid_registration_marks, registration_per_region = reg_mark_engine(vehicle_data: file)
+  valid_registration_marks, invalid_registration_marks, registration_per_region = reg_mark_generator(vehicle_data: file)
 
   valid_reg_marks = FileHandler.write_file(file_name: 'valid_reg_marks', vehicle: valid_registration_marks)
   invalid_reg_marks = FileHandler.write_file(file_name: 'invalid_reg_marks', vehicle: invalid_registration_marks)
