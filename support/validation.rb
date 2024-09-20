@@ -11,11 +11,11 @@ module Validation
     valid_codes = {
       :swansea => {
         :first_letter => 'C',
-        :second_letter => %w[A B C D E F G H J K].sample
+        :second_letter => %w[A B C D E F G H I J K].sample
       },
       :cardiff => {
         :first_letter => 'C',
-        :second_letter => %w[L M N P Q R S T U V W X Y Z].sample
+        :second_letter => %w[L M N O P Q R S T U V W X Y Z].sample
       },
       :birmingham => {
         :first_letter => 'B',
