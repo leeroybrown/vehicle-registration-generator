@@ -11,15 +11,15 @@ module Validation
     valid_codes = {
       :swansea => {
         :first_letter => 'C',
-        :second_letter => %w[A B C D E F G H I J K].sample
+        :second_letter => ('A'..'K').to_a.sample
       },
       :cardiff => {
         :first_letter => 'C',
-        :second_letter => %w[L M N O P Q R S T U V W X Y Z].sample
+        :second_letter => ('L'..'Z').to_a.sample
       },
       :birmingham => {
         :first_letter => 'B',
-        :second_letter => %w[A B C].sample
+        :second_letter => ('A'..'C').to_a.sample
       }
     }
     if valid_codes.has_key?(registration_area)
